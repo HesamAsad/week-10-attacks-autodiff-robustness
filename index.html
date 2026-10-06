@@ -359,6 +359,28 @@ header.hero h1 { font-size: clamp(1.9rem, 3.4vw, 2.75rem); letter-spacing: -0.02
 .nchain .ar { align-self: center; color: var(--muted); }
 details.sol { margin-top: .9rem; }
 
+
+.stepwise { padding: .2rem 1.2rem 1rem; }
+.stepwise .ah { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: .5rem 1rem; padding: .7rem 0 .6rem; border-bottom: 1px solid var(--rule); margin-bottom: .6rem; font-family: var(--font-display); font-weight: 700; color: var(--data); }
+.stepctl { display: inline-flex; flex-wrap: wrap; gap: .4rem; }
+.stepctl button { font-size: .8rem; padding: .3rem .65rem; }
+ol.steps { list-style: none; padding: 0; margin: 0; display: grid; gap: .8rem; counter-reset: none; }
+.step { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 17rem); gap: 1rem; align-items: start; padding: .7rem 0; border-bottom: 1px dashed var(--rule); }
+.step:last-child { border-bottom: 0; }
+.step .work { min-width: 0; }
+.step .st { font-family: var(--font-display); font-weight: 700; font-size: .95rem; margin-bottom: .35rem; display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; }
+.step .rv { font-size: .78rem; padding: .25rem .65rem; }
+.step .body { animation: stepIn .35s ease; }
+.step .body .katex-display { margin: .5rem 0; }
+.step.open .rv { display: none; }
+@keyframes stepIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .step .body { animation: none; } }
+.note { border-left: 3px solid var(--model); background: color-mix(in srgb, var(--model) 7%, var(--surface)); border-radius: 0 8px 8px 0; padding: .5rem .8rem; font-size: .9rem; min-width: 0; overflow-x: auto; }
+.note .nh { font-family: var(--font-display); font-weight: 700; font-size: .7rem; letter-spacing: .1em; text-transform: uppercase; color: var(--model); margin-bottom: .2rem; }
+.note p { margin: .3rem 0; }
+.note .katex-display { margin: .35rem 0; font-size: .95em; }
+@media (max-width: 760px) { .step { grid-template-columns: minmax(0, 1fr); } .step .note { order: -1; } }
+
 .hero-cv { width: 100%; aspect-ratio: 5 / 4; display: block; border-radius: 12px; border: 1px solid var(--rule); background: var(--surface); }
 </style>
 
@@ -567,20 +589,32 @@ details.sol { margin-top: .9rem; }
     <div class="readout" id="atk-read"></div>
     <div class="cap">The dashed square is the budget around the start point. When a step would leave it, a faded point marks the raw step and the solid point the clipped one. Try \(\epsilon = 0.1\): no attack exists, because the boundary is \(1/6\) away in \(\ell_\infty\).</div>
   </div>
-  <details class="answer">
-    <summary>Official answer</summary>
-    <p>At \(\mathbf x = (1,3)\) the score is negative, so the prediction is Class 2:</p>
-    $$f(1,3) = -0.5 < 0.$$
-    <p>The gradient is constant:</p>
-    $$\nabla_{\mathbf x} f = W.$$
-    <p>One update step:</p>
-    $$\begin{bmatrix} x_1^{(1)} \\ x_2^{(1)} \end{bmatrix} = \mathbb P\left(\begin{bmatrix}1\\3\end{bmatrix} + 1\cdot\operatorname{sign}\begin{bmatrix}2\\-1\end{bmatrix}\right) = \mathbb P\begin{bmatrix}2\\2\end{bmatrix}.$$
-    <p>The point \((2,2)\) is within \(\ell_\infty\) distance 3 of \((1,3)\), so the projection leaves it unchanged:</p>
-    $$\mathbf x^{(1)} = \begin{bmatrix}2\\2\end{bmatrix}.$$
-    <p>Now the score is positive, so the prediction is Class 1, and \(\mathbf x^{(1)}\) is an adversarial example:</p>
-    $$f(2,2) = 4 - 2 + 0.5 = 2.5 > 0.$$
+  <div class="answer stepwise">
+    <div class="ah"><span>Official answer, step by step</span><span class="stepctl"><button type="button" class="rv-next primary">Reveal next step</button><button type="button" class="rv-all">Reveal all</button><button type="button" class="rv-none">Hide all</button></span></div>
+    <ol class="steps">
+    <li class="step">
+      <div class="work"><div class="st">Step 1 · Classify the starting point</div><button type="button" class="rv">Reveal step</button><div class="body" hidden><p>When \(\mathbf x = (1,3)\):</p>$$f(1,3) = 2 - 3 + 0.5 = -0.5 < 0,$$<p>so the prediction is <b>Class 2</b>.</p></div></div>
+      <aside class="note"><div class="nh">Cheat note</div><p>Decision rule:</p>$$f > 0 \Rightarrow \text{Class 1}$$$$f \le 0 \Rightarrow \text{Class 2}$$<p>Score:</p>$$f(\mathbf x) = 2x_1 - x_2 + 0.5$$</aside>
+    </li>
+    <li class="step">
+      <div class="work"><div class="st">Step 2 · Compute the gradient</div><button type="button" class="rv">Reveal step</button><div class="body" hidden>$$\nabla_{\mathbf x} f = W = \begin{bmatrix}2\\-1\end{bmatrix}, \qquad \operatorname{sign}(\nabla_{\mathbf x} f) = \begin{bmatrix}1\\-1\end{bmatrix}.$$</div></div>
+      <aside class="note"><div class="nh">Cheat note</div><p>For a linear function the gradient is the weight vector, the same at every point:</p>$$\nabla_{\mathbf x}(W\mathbf x + b) = W^\top$$</aside>
+    </li>
+    <li class="step">
+      <div class="work"><div class="st">Step 3 · Take one sign-gradient step</div><button type="button" class="rv">Reveal step</button><div class="body" hidden>$$\begin{bmatrix} x_1^{(1)} \\ x_2^{(1)} \end{bmatrix} = \mathbb P\left(\begin{bmatrix}1\\3\end{bmatrix} + 1\cdot\operatorname{sign}\begin{bmatrix}2\\-1\end{bmatrix}\right) = \mathbb P\begin{bmatrix}2\\2\end{bmatrix}.$$</div></div>
+      <aside class="note"><div class="nh">Cheat note</div><p>Iterative FGSM update:</p>$$\mathbf x_{k+1} = \mathbb P\big(\mathbf x_k + \alpha\operatorname{sign}\nabla f\big)$$<p>Step size \(\alpha = 1\). We step <em>up</em> the score, because Class 1 needs \(f > 0\).</p></aside>
+    </li>
+    <li class="step">
+      <div class="work"><div class="st">Step 4 · Apply the projection</div><button type="button" class="rv">Reveal step</button><div class="body" hidden><p>\((2,2)\) is within an \(\ell_\infty\) distance of 3 from \((1,3)\):</p>$$\lVert (2,2) - (1,3)\rVert_\infty = \max(1,\ 1) = 1 \le 3,$$<p>so the projection leaves it unchanged:</p>$$\mathbf x^{(1)} = \begin{bmatrix}2\\2\end{bmatrix}.$$</div></div>
+      <aside class="note"><div class="nh">Cheat note</div><p>\(\ell_\infty\) projection = clip each coordinate into \([x_{0,i}-\epsilon,\ x_{0,i}+\epsilon]\).</p><p>With \(\epsilon = 3\) the box is</p>$$x_1 \in [-2, 4], \quad x_2 \in [0, 6].$$</aside>
+    </li>
+    <li class="step">
+      <div class="work"><div class="st">Step 5 · Check whether the label flipped</div><button type="button" class="rv">Reveal step</button><div class="body" hidden>$$f(2,2) = 4 - 2 + 0.5 = 2.5 > 0,$$<p>a prediction of <b>Class 1</b>. So \(\mathbf x^{(1)} = (2,2)\) is an adversarial example.</p></div></div>
+      <aside class="note"><div class="nh">Cheat note</div><p>An adversarial example is a point inside the budget whose predicted class differs from the original.</p></aside>
+    </li>
+    </ol>
     <p class="small"><b>Worth saying in class.</b> A step of 1 overshoots a lot: the smallest \(\ell_\infty\) change that flips the label is only \(1/6\). The projection never activates, because \(\alpha = 1\) is smaller than \(\epsilon = 3\). If you keep iterating, the point walks to the box corner \((4, 0)\) and stays there.</p>
-  </details>
+  </div>
 </section>
 
 <hr class="part">
@@ -750,23 +784,36 @@ details.sol { margin-top: .9rem; }
     </div>
   </div>
   <div class="readout" id="q2-check" style="margin-top:1rem"></div>
-  <details class="answer">
-    <summary>Official answer: the two modes</summary>
-    <p>With \(h(\mathbf b) = [b_0 - b_1]\), the matrices of partial derivatives are:</p>
-    $$f_{\mathbf x}(\mathbf x) = \begin{bmatrix} e^{x_1} & 0 \\ 1/x_2 & -x_1/x_2^2 \\ 0 & 2 \end{bmatrix}$$
-    $$g_{\mathbf a}(\mathbf a) = \begin{bmatrix} -\sin(a_1) & 0 & 0 \\ 0 & \cos(a_2+a_3) & \cos(a_2+a_3)\end{bmatrix}$$
-    $$h_{\mathbf b}(\mathbf b) = \begin{bmatrix} 1 & -1 \end{bmatrix}$$
-    <p><b>Forward mode, step 1:</b></p>
-    $$g_{\mathbf a}\times f_{\mathbf x} = \begin{bmatrix} -\sin(a_1)\,e^{x_1} & 0 \\ \cos(a_2+a_3)/x_2 & \cos(a_2+a_3)\big(-x_1/x_2^2 + 2\big)\end{bmatrix}$$
-    <p><b>Forward mode, step 2:</b></p>
-    $$h_{\mathbf b}\,(g_{\mathbf a}\times f_{\mathbf x}) = \Big[\,-\sin(e^{x_1})e^{x_1} - \tfrac{\cos(x_1/x_2 + 2x_2)}{x_2} \qquad -\cos(x_1/x_2 + 2x_2)\big(-x_1/x_2^2 + 2\big)\,\Big]$$
-    <p>Multiplications: \(2\times3\times2 = 12\) for the first product and \(1\times2\times2 = 4\) for the second. <b>Total 16.</b></p>
-    <p><b>Reverse mode, step 1:</b></p>
-    $$h_{\mathbf b}\times g_{\mathbf a} = \big[\,-\sin(a_1) \quad -\cos(a_2+a_3) \quad -\cos(a_2+a_3)\,\big]$$
-    <p><b>Reverse mode, step 2:</b> the same gradient as forward mode.</p>
-    <p>Multiplications: \(1\times2\times3 = 6\) for the first product and \(1\times3\times2 = 6\) for the second. <b>Total 12.</b></p>
-    <p class="small">The official sheet labels the last reverse factor \(f_{\mathbf a}\); it means \(f_{\mathbf x}\). It also stops at the symbolic form. The numbers at \((2,4)\) are in the live panels above.</p>
-  </details>
+  <div class="answer stepwise">
+    <div class="ah"><span>Official answer, step by step</span><span class="stepctl"><button type="button" class="rv-next primary">Reveal next step</button><button type="button" class="rv-all">Reveal all</button><button type="button" class="rv-none">Hide all</button></span></div>
+    <ol class="steps">
+    <li class="step">
+      <div class="work"><div class="st">Step 1 · Write down the layer Jacobians</div><button type="button" class="rv">Reveal step</button><div class="body" hidden><p>With \(h(\mathbf b) = [b_0 - b_1]\):</p>$$f_{\mathbf x} = \begin{bmatrix} e^{x_1} & 0 \\ 1/x_2 & -x_1/x_2^2 \\ 0 & 2 \end{bmatrix}$$$$g_{\mathbf a} = \begin{bmatrix} -\sin(a_1) & 0 & 0 \\ 0 & \cos(a_2+a_3) & \cos(a_2+a_3)\end{bmatrix}$$$$h_{\mathbf b} = \begin{bmatrix} 1 & -1 \end{bmatrix}$$</div></div>
+      <aside class="note"><div class="nh">Cheat note</div><p>A Jacobian has shape (outputs × inputs).</p><p>Derivatives you need:</p>$$\tfrac{d}{dx}e^{x} = e^{x}$$$$\tfrac{d}{da}\cos a = -\sin a$$$$\tfrac{d}{du}\sin u = \cos u$$$$\tfrac{\partial}{\partial x_1}\tfrac{x_1}{x_2} = \tfrac{1}{x_2}, \quad \tfrac{\partial}{\partial x_2}\tfrac{x_1}{x_2} = -\tfrac{x_1}{x_2^2}$$</aside>
+    </li>
+    <li class="step">
+      <div class="work"><div class="st">Step 2 · Forward mode: the first product</div><button type="button" class="rv">Reveal step</button><div class="body" hidden>$$g_{\mathbf a}\times f_{\mathbf x} = \begin{bmatrix} -\sin(a_1)\,e^{x_1} & 0 \\ \cos(a_2+a_3)/x_2 & \cos(a_2+a_3)\big(-x_1/x_2^2 + 2\big)\end{bmatrix}$$<p>Shapes \((2\times3)(3\times2)\): \(2\times3\times2 = 12\) multiplications.</p></div></div>
+      <aside class="note"><div class="nh">Cheat note</div><p>Forward mode multiplies from the <b>input side</b>: \(g_{\mathbf a} f_{\mathbf x}\) first.</p><p>Cost of an \((m\times n)(n\times p)\) product:</p>$$m\cdot n\cdot p$$</aside>
+    </li>
+    <li class="step">
+      <div class="work"><div class="st">Step 3 · Forward mode: the second product</div><button type="button" class="rv">Reveal step</button><div class="body" hidden>$$h_{\mathbf b}\,(g_{\mathbf a}\times f_{\mathbf x}) = \Big[\,-\sin(e^{x_1})e^{x_1} - \tfrac{\cos(x_1/x_2 + 2x_2)}{x_2} \qquad -\cos(x_1/x_2 + 2x_2)\big(-x_1/x_2^2 + 2\big)\,\Big]$$<p>\(1\times2\times2 = 4\) multiplications. <b>Forward total: 16.</b></p></div></div>
+      <aside class="note"><div class="nh">Cheat note</div><p>Shapes now \((1\times2)(2\times2)\).</p><p>Then substitute \(a_1 = e^{x_1}\) and \(a_2 + a_3 = x_1/x_2 + 2x_2\).</p></aside>
+    </li>
+    <li class="step">
+      <div class="work"><div class="st">Step 4 · Reverse mode: the first product</div><button type="button" class="rv">Reveal step</button><div class="body" hidden>$$h_{\mathbf b}\times g_{\mathbf a} = \big[\,-\sin(a_1) \quad -\cos(a_2+a_3) \quad -\cos(a_2+a_3)\,\big]$$<p>Shapes \((1\times2)(2\times3)\): \(1\times2\times3 = 6\) multiplications.</p></div></div>
+      <aside class="note"><div class="nh">Cheat note</div><p>Reverse mode multiplies from the <b>output side</b>: \(h_{\mathbf b} g_{\mathbf a}\) first.</p><p>Every intermediate result is one row tall.</p></aside>
+    </li>
+    <li class="step">
+      <div class="work"><div class="st">Step 5 · Reverse mode: the second product</div><button type="button" class="rv">Reveal step</button><div class="body" hidden>$$(h_{\mathbf b}\times g_{\mathbf a})\times f_{\mathbf x} = \Big[\,-\sin(e^{x_1})e^{x_1} - \tfrac{\cos(x_1/x_2 + 2x_2)}{x_2} \qquad -\cos(x_1/x_2 + 2x_2)\big(-x_1/x_2^2 + 2\big)\,\Big]$$<p>\(1\times3\times2 = 6\) multiplications. <b>Reverse total: 12.</b></p></div></div>
+      <aside class="note"><div class="nh">Cheat note</div><p>Shapes now \((1\times3)(3\times2)\).</p><p>Both modes must give the same gradient: only the bracketing differs.</p></aside>
+    </li>
+    <li class="step">
+      <div class="work"><div class="st">Step 6 · Evaluate at \(\mathbf x = (2,4)\) <span class="pill pr">not in the official sheet</span></div><button type="button" class="rv">Reveal step</button><div class="body" hidden>$$\frac{\partial y}{\partial x_1} \approx -0.8939 \times 7.389 - \frac{-0.6020}{4} \approx -6.4542$$$$\frac{\partial y}{\partial x_2} \approx -(-0.6020)\big(2 - \tfrac{2}{16}\big) \approx 1.1288$$$$\nabla_{\mathbf x} y(2,4) \approx [-6.4542,\ \ 1.1288]$$</div></div>
+      <aside class="note"><div class="nh">Cheat note</div><p>Intermediate values:</p>$$a_1 = e^2 \approx 7.389$$$$a_2 + a_3 = 0.5 + 8 = 8.5$$$$\sin(e^2) \approx 0.8939$$$$\cos(8.5) \approx -0.6020$$</aside>
+    </li>
+    </ol>
+    <p class="small">The official sheet labels the last reverse factor \(f_{\mathbf a}\); it means \(f_{\mathbf x}\). It stops at the symbolic form, so step 6 is added here and checked against finite differences in the live panel above.</p>
+  </div>
 </section>
 
 <section id="q2abc">
@@ -932,12 +979,27 @@ details.sol { margin-top: .9rem; }
 <section id="q3ans">
   <div class="prereq">Answer</div>
   <h3><span class="pn">3.6</span>Answer and discussion</h3>
-  <details class="answer" open>
-    <summary>Official answer</summary>
-    <p>The generalisation gap is the difference between train and test accuracy of a model. It represents the ability of a model to generalise its predictions to a holdout set.</p>
-    <p>For standard machine learning, the holdout test set has the same distribution as the training set, but this may not be true for real-world data.</p>
-    <p>Adversarial training, which is a form of robust training, typically shows a <b>larger</b> generalisation gap. This suggests that, at training time, models are overfitting to the adversarially perturbed variants of the training data.</p>
-  </details>
+  <div class="answer stepwise">
+    <div class="ah"><span>Official answer, step by step</span><span class="stepctl"><button type="button" class="rv-next primary">Reveal next step</button><button type="button" class="rv-all">Reveal all</button><button type="button" class="rv-none">Hide all</button></span></div>
+    <ol class="steps">
+    <li class="step">
+      <div class="work"><div class="st">Step 1 · Define the generalisation gap</div><button type="button" class="rv">Reveal step</button><div class="body" hidden><p>The generalisation gap is the difference between train and test accuracy of a model. It represents the ability of a model to generalise its predictions to a holdout set.</p></div></div>
+      <aside class="note"><div class="nh">Cheat note</div>$$\text{gap} = \text{Acc}_{\text{train}} - \text{Acc}_{\text{test}}$$<p>A small gap means the model generalises.</p></aside>
+    </li>
+    <li class="step">
+      <div class="work"><div class="st">Step 2 · Question the i.i.d. assumption</div><button type="button" class="rv">Reveal step</button><div class="body" hidden><p>For standard machine learning, the holdout test set has the same distribution as the training set, but this may not be true for real-world data.</p></div></div>
+      <aside class="note"><div class="nh">Cheat note</div><p>The standard split assumes train and test data come from the <b>same distribution</b>. Attacks and deployment shifts break this.</p></aside>
+    </li>
+    <li class="step">
+      <div class="work"><div class="st">Step 3 · State the effect of adversarial training</div><button type="button" class="rv">Reveal step</button><div class="body" hidden><p>Adversarial training, which is a form of robust training, typically shows a <b>larger</b> generalisation gap.</p></div></div>
+      <aside class="note"><div class="nh">Cheat note</div><p>Adversarial training:</p>$$\min_\theta\ \mathbb E\Big[\max_{\lVert\delta\rVert\le\epsilon}\mathcal L(f_\theta(\mathbf x+\delta), y)\Big]$$<p>Compare robust train and test accuracy (3.1, warm-up 3.3).</p></aside>
+    </li>
+    <li class="step">
+      <div class="work"><div class="st">Step 4 · Interpret it</div><button type="button" class="rv">Reveal step</button><div class="body" hidden><p>This suggests that, at training time, models are overfitting to the adversarially perturbed variants of the training data.</p></div></div>
+      <aside class="note"><div class="nh">Cheat note</div><p>Overfitting = fitting specifics of the training set that do not carry over.</p><p>Here the "specifics" are the \(\epsilon\)-boxes around the training points (3.4, 3.5).</p></aside>
+    </li>
+    </ol>
+  </div>
   <div class="prose">
     <h4>Implications for learning and decision boundaries</h4>
     <p><b>Models fit what they are shown.</b> Adversarial training constrains the boundary only inside the boxes around training points. A flexible model can memorise those boxes, reaching near-100% robust training accuracy, without keeping a margin around <em>new</em> points. This robust overfitting grows with longer training, and early stopping helps<sup class="cite"><a href="#ref-6">6</a></sup>.</p>
@@ -1685,6 +1747,16 @@ function chainCosts(sizes) { // sizes: [n0 (inputs), n1, ..., nL (outputs)]; Jac
   draggable(cv, px => Math.abs(P.inv(px) - thr) < 0.12, px => { thr = Math.max(-0.3, Math.min(1.5, Math.round(P.inv(px) * 100) / 100)); draw(); });
   draw();
 })();
+
+// ---------- step-by-step official answers with cheat notes ----------
+$$('.stepwise').forEach(box => {
+  const steps = $$('.step', box);
+  const open = (s, on) => { $('.body', s).hidden = !on; s.classList.toggle('open', on); };
+  steps.forEach(s => $('.rv', s).addEventListener('click', () => open(s, true)));
+  $('.rv-next', box).addEventListener('click', () => { const s = steps.find(x => !x.classList.contains('open')); if (s) { open(s, true); s.scrollIntoView({ block: 'nearest', behavior: reduceMotion ? 'auto' : 'smooth' }); } });
+  $('.rv-all', box).addEventListener('click', () => steps.forEach(s => open(s, true)));
+  $('.rv-none', box).addEventListener('click', () => steps.forEach(s => open(s, false)));
+});
 })();
 </script>
 
